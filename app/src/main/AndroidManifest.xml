@@ -21,11 +21,10 @@
             android:value="AIzaSyAiOp8fEBsVcnpkrSEPvA9L09VBPcG9yXk" />
 
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
