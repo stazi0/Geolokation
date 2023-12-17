@@ -25,14 +25,15 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import android.provider.Settings
+import android.util.Log
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import java.util.Locale
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     lateinit var mMap: GoogleMap
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
-    var latitude = 60.718531796658844
-    var longitude = 45.313874166220373
+    var latitude =  0.000000000000001
+    var longitude = 0.000000000000001
     private val permissionId = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +42,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_main)
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        //Log.d("getLocation_forGetLoc", "latitude: ${latitude}")
+        //Log.d("getLocation_forGetLoc", "longitude: ${longitude}")
         getLocation()
+        //Log.d("getLocation_afterGetLoc", "latitude: ${latitude}")
+        //Log.d("getLocation_afterGetLoc", "longitude: ${longitude}")
 
         var mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -50,35 +55,50 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap){
         mMap = googleMap
-        var point = LatLng(latitude, longitude)
-
-        mMap.addMarker(MarkerOptions().position(point).title("Я тут"))
-        mMap.isBuildingsEnabled = true
-        mMap.isIndoorEnabled = true
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(point))
-        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15f))
     }
 
     @SuppressLint("MissingPermission", "SetTextI18n")
     private fun getLocation( ) {
+        //Log.d("getLocation", "start: ${latitude}")
         if (checkPermissions()) {
+            //Log.d("getLocation", "checkPermissions: ${latitude}")
             if (isLocationEnabled()) {
+                //Log.d("getLocation", "isLocationEnabled: ${latitude}")
                 mFusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
                     val location: Location? = task.result
+                    //Log.d("getLocation", "mFusedLocationClient start: ${latitude}")
                     if (location != null) {
                         val geocoder = Geocoder(this, Locale.getDefault())
                         val list: List<Address>? =
                             geocoder.getFromLocation(location.latitude, location.longitude, 1)
                         latitude = list?.get(0)!!.latitude
                         longitude = list?.get(0)!!.longitude
+                        //Log.d("getLocation", "for addMarker lat: ${latitude}")
+                        //Log.d("getLocation", "for addMarker long: ${longitude}")
+                        addMarkerGeoLocation()
+                        //Log.d("getLocation", "aft addMark lat: ${latitude}")
+                        //Log.d("getLocation", "aft addMark long: ${longitude}")
                     }
                 }
             } else {
+                //Log.d("getLocation", "isLocationEnabled else: ${latitude}")
                 Toast.makeText(this, "Увімкніть геолокацію", Toast.LENGTH_LONG).show()
                 val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                 startActivity(intent)
             }
-        } else { requestPermissions() }
+        } else {
+            //Log.d("getLocation", "checkPermissions else: ${latitude}")
+            requestPermissions() }
+    }
+
+    private fun addMarkerGeoLocation(){
+        //Log.d("getLocation", "in addMarker lat: ${latitude}")
+        //Log.d("getLocation", "in addMarker long: ${longitude}")
+        var point = LatLng(latitude, longitude)
+        mMap.addMarker(MarkerOptions().position(point).title("Я тут"))
+        mMap.isBuildingsEnabled = true
+        mMap.isIndoorEnabled = true
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(point))
     }
 
 
